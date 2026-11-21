@@ -175,10 +175,10 @@ const events = computed<TimelineEvent[]>(() => {
     content: "";
     position: absolute;
     left: 5px;
-    top: 9px;
-    bottom: 9px;
+    top: 10px;
+    bottom: 10px;
     width: 1px;
-    background: rgba(128, 128, 128, 0.35);
+    background: var(--timeline-line);
   }
 }
 .event {
@@ -196,11 +196,12 @@ const events = computed<TimelineEvent[]>(() => {
   }
   .dot {
     position: absolute;
-    left: -18px;
-    top: 3px;
-    width: 11px;
-    height: 11px;
+    left: -16.5px;
+    top: 6px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
+    box-shadow: 0 0 0 2px var(--popup-bg);
     &.error {
       background: var(--error-color);
     }
@@ -214,6 +215,7 @@ const events = computed<TimelineEvent[]>(() => {
     flex-wrap: wrap;
     gap: 8px;
     min-width: 0;
+    min-height: 20px;
     .event-title {
       font-size: 13px;
       font-weight: 600;

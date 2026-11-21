@@ -189,7 +189,7 @@ export const formatSiteData = (
         incidents:
           activeSeconds > 0 && downtime[index]?.incidents.length
             ? [...(downtime[index]?.incidents ?? [])].sort(
-                (a, b) => a.startedAt - b.startedAt,
+                (a, b) => b.startedAt - a.startedAt,
               )
             : undefined,
       };

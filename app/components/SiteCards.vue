@@ -150,12 +150,14 @@
                 ]"
                 @click="openIncidentById(incident.id)"
               >
-                <span
-                  class="dot"
-                  :class="
-                    incident.resolvedAt ? 'resolved-incident' : 'ongoing'
-                  "
-                />
+                <span class="calendar-pop-dot">
+                  <span
+                    class="dot"
+                    :class="
+                      incident.resolvedAt ? 'resolved-incident' : 'ongoing'
+                    "
+                  />
+                </span>
                 <div class="calendar-pop-text">
                   <div class="calendar-pop-title-row">
                     <span class="calendar-pop-title">
@@ -306,10 +308,12 @@
             @click="openIncidentById(incident.id)"
             @keydown.enter="openIncidentById(incident.id)"
           >
-            <span
-              class="dot"
-              :class="incident.resolvedAt ? 'resolved-incident' : 'ongoing'"
-            />
+            <span class="bar-tooltip-dot">
+              <span
+                class="dot"
+                :class="incident.resolvedAt ? 'resolved-incident' : 'ongoing'"
+              />
+            </span>
             <div class="event-text">
               <span class="event-monitor-row">
                 <span class="event-monitor">{{ incident.monitorName }}</span>
@@ -564,6 +568,8 @@ const incidentsByDate = computed(() => {
       map.set(day.dateText, list);
     });
   });
+  // 最新事件在前
+  map.forEach((list) => list.sort((a, b) => b.startedAt - a.startedAt));
   return map;
 });
 
@@ -1040,17 +1046,21 @@ onBeforeUnmount(() => {
     padding: 6px;
     margin: 0 -6px;
     border-radius: 6px;
-    .dot {
+    .calendar-pop-dot {
+      display: flex;
+      align-items: center;
       flex-shrink: 0;
-      width: 8px;
-      height: 8px;
-      margin-top: 7px;
-      border-radius: 50%;
-      &.resolved-incident {
-        background: var(--warn-color);
-      }
-      &.ongoing {
-        background: var(--error-color);
+      height: 21px;
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        &.resolved-incident {
+          background: var(--warn-color);
+        }
+        &.ongoing {
+          background: var(--error-color);
+        }
       }
     }
     &.clickable {
@@ -1190,17 +1200,21 @@ onBeforeUnmount(() => {
     border-radius: 6px;
     font-size: 12px;
     line-height: 1.6;
-    .dot {
+    .bar-tooltip-dot {
+      display: flex;
+      align-items: center;
       flex-shrink: 0;
-      width: 6px;
-      height: 6px;
-      margin-top: 6px;
-      border-radius: 50%;
-      &.resolved-incident {
-        background: var(--warn-color);
-      }
-      &.ongoing {
-        background: var(--error-color);
+      height: 1.6em;
+      .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        &.resolved-incident {
+          background: var(--warn-color);
+        }
+        &.ongoing {
+          background: var(--error-color);
+        }
       }
     }
     &.clickable {
