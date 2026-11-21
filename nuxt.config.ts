@@ -1,0 +1,215 @@
+import AutoImport from "unplugin-auto-import/vite";
+import { NaiveUiResolver } from "unplugin-vue-components/resolvers";
+import Components from "unplugin-vue-components/vite";
+import pkg from "./package.json";
+
+// https://nuxt.com/docs/api/configuration/nuxt-config
+
+// EdgeOne's environment variable input does not allow spaces.
+// Text values can use "+" as a space placeholder, e.g. SITE_TITLE="Huoiop+NET+站点监测".
+const envText = (key: string, fallback: string) =>
+  (process.env[key] ?? fallback).replace(/\+/g, " ");
+
+// Prefer SHOW_LINKS (documented); keep SHOW_LINK as a legacy alias.
+// Unset defaults to true; only an explicit "true" enables links.
+const showLinkEnv = process.env.SHOW_LINKS ?? process.env.SHOW_LINK;
+
+const siteGithub =
+  process.env.SITE_GITHUB ?? "https://github.com/imsyy/site-status";
+
+// site env
+const siteConfig = {
+  siteTitle: envText("SITE_TITLE", "IMSYY 站点监测"),
+  siteDescription: envText("SITE_DESCRIPTION", "一个简约的站点监测"),
+  siteKeywords: envText("SITE_KEYWORDS", "站点监测,监测,监控"),
+  siteLogo: process.env.SITE_LOGO || "/favicon.ico",
+  siteIcp: envText("SITE_ICP", ""),
+  // Footer / nav links. Leave a value empty to hide the related button.
+  siteGithub,
+  siteHome: process.env.SITE_HOME ?? "https://www.imsyy.top",
+  siteEmail: process.env.SITE_EMAIL ?? "one@imsyy.top",
+  // 版权栏作者固定为 Huoiop，不再通过环境变量配置
+  siteAuthor: "Huoiop",
+  siteAuthorUrl: "https://github.com/Huoiop/",
+  countDays: Number(process.env.COUNT_DAYS || 90),
+  showLink:
+    showLinkEnv === undefined ? true : showLinkEnv.toLowerCase() === "true",
+  platform: process.env.DEPLOYMENT_PLATFORM || "cloudflare",
+  version: pkg.version,
+};
+
+export default defineNuxtConfig({
+  // modules
+  modules: [
+    "@pinia/nuxt",
+    "pinia-plugin-persistedstate",
+    "@nuxt/eslint",
+    "nuxtjs-naive-ui",
+    "@vite-pwa/nuxt",
+    "@nuxt/icon",
+    "@nuxtjs/color-mode",
+    "@vueuse/nuxt",
+    "nuxt-lodash",
+    "@nuxtjs/i18n",
+    // keep this a plain array so EdgeOne's adapter can inject its module
+    ...(siteConfig.platform === "cloudflare" ? ["@nuxthub/core"] : []),
+  ],
+  // ssr
+  ssr: false,
+  // devtools
+  devtools: { enabled: true },
+  // app
+  app: {
+    rootAttrs: { id: "nuxt-app" },
+    // site-meta
+    head: {
+      title: siteConfig.siteTitle,
+      meta: [
+        {
+          name: "description",
+          content: siteConfig.siteDescription,
+        },
+        {
+          name: "keywords",
+          content: siteConfig.siteKeywords,
+        },
+        {
+          name: "viewport",
+          content: "width=device-width, initial-scale=1.0",
+        },
+        {
+          name: "theme-color",
+          content: "#ffffff",
+        },
+      ],
+      link: [
+        {
+          rel: "preconnect",
+          href: "https://s1.hdslb.com",
+          crossorigin: "anonymous",
+        },
+        {
+          rel: "stylesheet",
+          href: "https://s1.hdslb.com/bfs/static/jinkela/long/font/regular.css",
+        },
+        { rel: "icon", href: siteConfig.siteLogo },
+        {
+          rel: "apple-touch-icon",
+          href: "/images/icons/normal/apple-touch-icon-180x180.png",
+          sizes: "180x180",
+        },
+        {
+          rel: "mask-icon",
+          href: "/images/icons/normal/maskable-icon-512x512.png",
+          color: "#ffffff",
+        },
+        // manifest
+        process.env.NODE_ENV !== "development"
+          ? {
+              rel: "manifest",
+              href: "/manifest.webmanifest",
+            }
+          : undefined,
+      ],
+      htmlAttrs: {
+        lang: "zh-CN",
+      },
+    },
+  },
+  // css
+  css: ["~/style/main.scss", "~/style/animate.scss"],
+  // env
+  runtimeConfig: {
+    apiUrl: process.env.API_URL || "https://api.uptimerobot.com/v3/",
+    apiKey: process.env.API_KEY,
+    sitePassword: process.env.SITE_PASSWORD,
+    siteSecretKey: process.env.SITE_SECRE_KEY || "site-status",
+    public: siteConfig,
+  },
+  devServer: { port: 8566 },
+  future: { compatibilityVersion: 4 },
+  compatibilityDate: "2024-11-11",
+  // vite
+  vite: {
+    plugins: [
+      AutoImport({
+        imports: [
+          {
+            "naive-ui": [
+              "useDialog",
+              "useMessage",
+              "useNotification",
+              "useLoadingBar",
+            ],
+          },
+        ],
+      }),
+      Components({
+        resolvers: [NaiveUiResolver()],
+      }),
+    ],
+    css: {
+      preprocessorOptions: {
+        scss: {
+          silenceDeprecations: ["legacy-js-api"],
+        },
+      },
+    },
+  },
+  // https://eslint.nuxt.com
+  eslint: {
+    config: {
+      stylistic: {
+        quotes: "double",
+        semi: true,
+      },
+    },
+  },
+  // i18n
+  i18n: {
+    vueI18n: "./lang/i18n.config.ts",
+  },
+  // icon
+  icon: {
+    mode: "svg",
+    customCollections: [
+      {
+        prefix: "icon",
+        dir: "./app/assets/icons",
+        normalizeIconName: false,
+      },
+    ],
+  },
+  // pwa
+  pwa: {
+    manifest: {
+      name: siteConfig.siteTitle,
+      short_name: siteConfig.siteDescription,
+      description: siteConfig.siteDescription,
+      theme_color: "#ffffff",
+      icons: [
+        {
+          src: "/images/icons/normal/pwa-64x64.png",
+          sizes: "64x64",
+          type: "image/png",
+        },
+        {
+          src: "/images/icons/normal/pwa-192x192.png",
+          sizes: "192x192",
+          type: "image/png",
+        },
+        {
+          src: "/images/icons/normal/pwa-512x512.png",
+          sizes: "512x512",
+          type: "image/png",
+        },
+        {
+          src: "/images/icons/normal/maskable-icon-512x512.png",
+          sizes: "512x512",
+          type: "image/png",
+          purpose: "maskable",
+        },
+      ],
+    },
+  },
+});

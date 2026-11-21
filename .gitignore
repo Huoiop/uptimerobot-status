@@ -1,0 +1,33 @@
+# Nuxt dev/build outputs
+.output
+.edgeone
+.data
+.nuxt
+.nitro
+.cache
+dist
+
+# Node dependencies
+node_modules
+
+# Logs
+logs
+*.log
+sw.*
+
+# Misc
+.DS_Store
+.fleet
+.idea
+
+# Agent notes (local only, never pushed)
+AGENTS.md
+agents.md
+
+# Local env files
+.env
+.env.*
+!.env.example
+
+.wrangler
+.vercel
