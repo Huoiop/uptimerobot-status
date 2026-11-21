@@ -15,7 +15,7 @@ const envText = (key: string, fallback: string) =>
 const showLinkEnv = process.env.SHOW_LINKS ?? process.env.SHOW_LINK;
 
 const siteGithub =
-  process.env.SITE_GITHUB ?? "https://github.com/imsyy/site-status";
+  process.env.SITE_GITHUB ?? "https://github.com/Huoiop/uptimerobot-status";
 
 // site env
 const siteConfig = {

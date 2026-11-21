@@ -91,6 +91,7 @@
     "affectedMonitor": "Affected {monitor}",
     "incidentsCount": "{count} incidents",
     "outage": "Outage",
+    "healthy": "Operational",
     "dayNoIncident": "No incidents on this day",
     "allMonitors": "All monitors",
     "incidentTitle": "Incident details",

@@ -25,7 +25,7 @@
       {{ $t("footer.fiveMinutes") }}
     </p>
     <p class="copy">
-      SiteStatus v{{ version }} · Copyright &copy; 2020 - {{ year }}
+      HuoiopStatus v{{ version }} · Copyright &copy; 2020 - {{ year }}
       <a @click="jumpLink(siteAuthorUrl)">{{ siteAuthor }}</a>
       <template v-if="siteIcp">
         ·

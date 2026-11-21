@@ -91,6 +91,7 @@
     "affectedMonitor": "영향: {monitor}",
     "incidentsCount": "{count}건의 장애",
     "outage": "서비스 중단",
+    "healthy": "정상 운영 중",
     "dayNoIncident": "이 날짜에 장애가 없습니다",
     "allMonitors": "모든 모니터",
     "incidentTitle": "이벤트 상세",

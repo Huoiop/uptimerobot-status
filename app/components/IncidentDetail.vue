@@ -132,23 +132,31 @@
             <div class="affected-tooltip-head">
               <span>
                 {{
-                  incident.resolvedAt
-                    ? $t("status.outage")
-                    : $t("card.investigating")
+                  hoveredSegment === "healthy"
+                    ? $t("status.healthy")
+                    : incident.resolvedAt
+                      ? $t("status.outage")
+                      : $t("card.investigating")
                 }}
               </span>
-              <span class="affected-tooltip-duration">
+              <span
+                v-if="hoveredSegment === 'incident'"
+                class="affected-tooltip-duration"
+              >
                 {{ formatDuration(currentDuration) }}
               </span>
             </div>
             <div class="affected-tooltip-time">
-              {{ shortTime(incident.startedAt) }}
-              <span class="arrow">→</span>
-              {{
-                incident.resolvedAt
-                  ? shortTime(incident.resolvedAt)
-                  : $t("card.ongoing")
-              }}
+              <template v-if="hoveredSegment === 'incident'">
+                {{ shortTime(incident.startedAt) }}
+                <span class="arrow">→</span>
+                {{
+                  incident.resolvedAt
+                    ? shortTime(incident.resolvedAt)
+                    : $t("card.ongoing")
+                }}
+              </template>
+              <template v-else>{{ cursorTime }}</template>
             </div>
           </div>
         </div>
@@ -238,6 +246,13 @@ const tooltipStyle = computed(() => {
     transform: pos.above ? "translate(-50%, -100%)" : "translateX(-50%)",
     maxWidth: `${width}px`,
   };
+});
+
+const hoveredSegment = computed<"healthy" | "incident">(() => {
+  if (cursorX.value === null) return "incident";
+  return cursorRatio.value < 0.0833 || cursorRatio.value > 0.9167
+    ? "healthy"
+    : "incident";
 });
 
 const cursorTime = computed(() => {

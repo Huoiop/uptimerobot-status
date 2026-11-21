@@ -91,6 +91,7 @@
     "affectedMonitor": "影响 {monitor}",
     "incidentsCount": "{count} 个故障",
     "outage": "服务中断",
+    "healthy": "运行正常",
     "dayNoIncident": "当日无故障记录",
     "allMonitors": "全部监控项",
     "incidentTitle": "事件详情",

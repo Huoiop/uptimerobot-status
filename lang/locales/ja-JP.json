@@ -91,6 +91,7 @@
     "affectedMonitor": "影響: {monitor}",
     "incidentsCount": "{count} 件の障害",
     "outage": "サービス停止",
+    "healthy": "正常稼働中",
     "dayNoIncident": "この日の障害はありません",
     "allMonitors": "すべての監視項目",
     "incidentTitle": "インシデント詳細",
