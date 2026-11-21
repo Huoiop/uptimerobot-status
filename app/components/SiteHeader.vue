@@ -3,11 +3,11 @@
   <header id="header" class="site-container">
     <div :class="['status-banner', status]">
       <div class="banner-main">
-        <StatusIcon :type="status" :size="18" />
-        <div class="banner-text">
+        <div class="banner-title-row">
+          <StatusIcon :type="status" :size="16" />
           <div class="banner-title">{{ statusText }}</div>
-          <div class="banner-desc">{{ statusDesc }}</div>
         </div>
+        <div class="banner-desc">{{ statusDesc }}</div>
       </div>
       <div v-if="updateText" class="banner-update">
         {{ $t("header.update") }} {{ updateText }}
@@ -99,12 +99,15 @@ useIntervalFn(
 }
 .banner-main {
   display: flex;
-  align-items: flex-start;
-  gap: 8px;
+  flex-direction: column;
+  gap: 4px;
   padding: 12px 16px 16px;
 }
-.banner-text {
-  min-width: 0;
+.banner-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 24px;
 }
 .banner-title {
   font-size: 16px;
@@ -113,7 +116,7 @@ useIntervalFn(
   color: var(--text-color);
 }
 .banner-desc {
-  margin-top: 4px;
+  margin-left: 24px;
   font-size: 14px;
   line-height: 20px;
   color: var(--muted-text);

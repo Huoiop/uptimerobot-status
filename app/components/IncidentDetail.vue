@@ -350,6 +350,7 @@ onMounted(load);
 .incident-page {
   padding-top: 24px;
   padding-bottom: 40px;
+  animation: page-in 0.35s ease both;
 }
 .back-link {
   display: inline-flex;

@@ -295,6 +295,7 @@ onMounted(load);
 .history-page {
   padding-top: 24px;
   padding-bottom: 40px;
+  animation: page-in 0.35s ease both;
 }
 .back-link {
   display: inline-flex;
@@ -367,6 +368,13 @@ onMounted(load);
 .history-month {
   margin-top: 32px;
   scroll-margin-top: 24px;
+  animation: panel-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+  &:nth-of-type(2) {
+    animation-delay: 0.06s;
+  }
+  &:nth-of-type(3) {
+    animation-delay: 0.12s;
+  }
 }
 .month-head {
   display: flex;

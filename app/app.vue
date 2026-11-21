@@ -4,7 +4,11 @@
       <SiteNav />
       <SiteHeader
         v-if="
-          !incidentId && !isHistory && siteLoaded && statusStore.loginStatus
+          !incidentId &&
+          !isHistory &&
+          siteLoaded &&
+          statusStore.loginStatus &&
+          statusStore.siteData
         "
       />
       <!-- 主内容 -->

@@ -14,6 +14,13 @@
               <div class="monitor-left">
                 <StatusIcon :type="siteStatusType(site)" :size="16" />
                 <span class="monitor-name">{{ site.name }}</span>
+                <span
+                  v-for="tag in site.tags"
+                  :key="tag.id ?? tag.name"
+                  class="tag-pill"
+                >
+                  {{ tag.name }}
+                </span>
                 <n-popover trigger="hover" placement="top">
                   <template #trigger>
                     <button class="info-btn" aria-label="info">
@@ -60,13 +67,6 @@
                     </div>
                   </div>
                 </n-popover>
-                <span
-                  v-for="tag in site.tags"
-                  :key="tag.id ?? tag.name"
-                  class="tag-pill"
-                >
-                  {{ tag.name }}
-                </span>
                 <span
                   v-if="
                     (site.status === 8 || site.status === 9) &&
@@ -786,6 +786,16 @@ onBeforeUnmount(() => {
   gap: 24px;
   padding-top: 24px;
   padding-bottom: 24px;
+  > .panel,
+  > .history-row {
+    animation: panel-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  > .panel:nth-of-type(2) {
+    animation-delay: 0.06s;
+  }
+  > .history-row {
+    animation-delay: 0.12s;
+  }
 }
 .panel {
   padding: 4px;
