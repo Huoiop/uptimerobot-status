@@ -1,158 +1,258 @@
 English | [简体中文](./README.zh-CN.md)
 
-# UptimeRobot Status
+<div align="center">
+<h1>HuoiopStatus</h1>
+<p>A DeepSeek-style status page powered by UptimeRobot API v3</p>
+<br />
+<img src="https://img.shields.io/github/last-commit/Huoiop/uptimerobot-status" alt="last commit"/>
+<img src="https://img.shields.io/github/languages/code-size/Huoiop/uptimerobot-status" alt="code size"/>
+<img src="https://img.shields.io/github/stars/Huoiop/uptimerobot-status?style=full" alt="GitHub stars"/>
+<img src="https://img.shields.io/github/forks/Huoiop/uptimerobot-status?style=full&color=orange" alt="GitHub forks"/>
+</div>
 
-A clean, DeepSeek-style status page powered by the **UptimeRobot API v3**.
+## ✨ About
 
-The status page design references [DeepSeek Status](https://status.deepseek.com/).
-This project is based on [imsyy/site-status](https://github.com/imsyy/site-status).
+A status page powered by the **UptimeRobot API v3**.
 
-## Features
+- The UI and interactions reference [DeepSeek Status](https://status.deepseek.com/)
+- This project is based on [imsyy/site-status](https://github.com/imsyy/site-status)
+- Fully adapted to UptimeRobot v3; the legacy v2 API is not supported
 
-- **UptimeRobot API v3** — read-only Bearer key, pagination, `getMonitors` and incident history. API v2 is not supported.
-- **Status dashboard** — overall status banner, per-monitor 90-day availability bars, tags and current incident details.
-- **Incident calendar** — colored day markers, hover details, and a day detail modal.
-- **Incident history** — a dedicated `/history` page grouped by month and date.
-- **Incident detail** — deep-linkable `/incidents/:id` page with affected components, a time bar, hover tooltips and an update timeline.
-- **Interactive timeline** — hover a bar to inspect a day, move the pointer to the tooltip to click through to the incident.
-- **Dark / light theme**, **4 languages** (`zh-CN`, `en`, `ja-JP`, `ko-KR`), responsive layout and PWA support.
-- **Optional password protection** — JWT login backed by `SITE_PASSWORD` and `SITE_SECRE_KEY`.
-- **Multiple deployment targets** — Cloudflare Pages / NuxtHub, generic Node.js / Vercel / Docker, EdgeOne Makers and Alibaba Cloud ESA.
+## 🎉 Features
 
-## Tech Stack
+- 🌍 Multiple deployment targets (Cloudflare, Vercel, Node, EdgeOne, ESA)
+- ✨ DeepSeek-style status page: status banner, system status, incident calendar
+- 📊 90-day daily availability bars for every monitor
+- 📅 Calendar with hover previews and a day detail modal
+- 📝 Dedicated incident history and deep-linkable incident detail pages
+- 🏷️ Monitor tags displayed everywhere the monitor appears
+- 🖱️ Hover tooltips on bars, calendar days and the affected-component timeline
+- 🌙 Dark / light theme and 4 languages (Simplified Chinese, English, Japanese, Korean)
+- 🔐 Optional password protection (JWT + Hash)
+- ⏲️ Server-side cache and automatic frontend refresh
+- 📱 Mobile-friendly layout and PWA support
+
+## 🧱 Tech Stack
 
 - [Nuxt 3](https://nuxt.com/) (SPA, `ssr: false`)
 - Vue 3, Naive UI, Pinia
 - Vue I18n
 - `@nuxt/icon`, `@vite-pwa/nuxt`, `@vueuse/nuxt`
-- HarmonyOS_Regular font (loaded from the Bilibili CDN)
+- HarmonyOS_Regular font (served by the Bilibili CDN)
 
-## Requirements
+## 📄 Pages and Routes
 
-- Node.js **20+** (22 recommended)
+| Route | Description |
+| --- | --- |
+| `/` | Dashboard: overall status, system status, 90-day bars and calendar |
+| `/history` | Incident history grouped by month and date |
+| `/incidents/:id` | Incident detail with affected components and update timeline |
+
+> This is an SPA with server API routes and **cannot be deployed as a purely static site**.
+> `/api/*`, `/history` and `/incidents/*` all require the Nitro server / Worker runtime.
+
+## 🚀 Quick Start
+
+Requirements:
+
+- Node.js **20+** (22.x recommended)
 - pnpm **9+**
 
-## Quick Start
-
 ```bash
+# Install dependencies
 pnpm install
+
+# Copy the environment template
 cp .env.example .env
-# edit .env and set at least API_KEY
+
+# Edit .env and set at least API_KEY
+# API_KEY must be an UptimeRobot Read-Only API key
+
+# Start the dev server
 pnpm dev
 ```
 
 Open <http://localhost:8566/>.
 
-Build for production:
+Production build:
 
 ```bash
 pnpm build
 ```
 
-`DEPLOYMENT_PLATFORM` selects the build target. See [Deployment](#deployment).
+`DEPLOYMENT_PLATFORM` controls the build target. See [Deployment](#-deployment).
 
-## Environment Variables
+## ⚙️ Environment Variables
 
-Copy `.env.example` to `.env` and fill in your own values. Never commit a real API key or JWT secret.
+Copy `.env.example` to `.env` and fill in your own values. **Never commit a real API key or JWT secret.**
 
 | Variable | Required | Description |
 | --- | --- | --- |
 | `API_URL` | No | UptimeRobot API base URL. Defaults to `https://api.uptimerobot.com/v3/`. Must be v3. |
-| `API_KEY` | Yes | UptimeRobot **Read-Only** API key. It is only used on the server. |
+| `API_KEY` | Yes | UptimeRobot Read-Only API key. Used only on the server. |
 | `DEPLOYMENT_PLATFORM` | No | `cloudflare` (default), `auto`, `eo` or `esa`. |
-| `SITE_TITLE` | No | Site title shown in the header and browser tab. |
+| `SITE_TITLE` | No | Site title. |
 | `SITE_DESCRIPTION` | No | Site description / meta description. |
 | `SITE_KEYWORDS` | No | Meta keywords. |
 | `SITE_LOGO` | No | Logo path, default `/favicon.ico`. |
-| `SITE_GITHUB` | No | GitHub link used in the footer / navigation. |
-| `SITE_HOME` | No | Home link used in the footer. Leave empty to hide. |
-| `SITE_EMAIL` | No | Email link used in the footer. A bare address gets `mailto:`. |
-| `SITE_ICP` | No | ICP filing number (China). Leave empty to hide. |
-| `COUNT_DAYS` | No | Number of days of daily uptime data. Default `90`; 30–90 recommended. |
+| `SITE_GITHUB` | No | Footer GitHub button link. |
+| `SITE_HOME` | No | Footer home button link. Leave empty to hide. |
+| `SITE_EMAIL` | No | Footer email button; a bare address gets `mailto:`. |
+| `SITE_ICP` | No | ICP filing number. Leave empty to hide. |
+| `COUNT_DAYS` | No | Days of daily availability data. Default `90`; 30–90 recommended. |
 | `SHOW_LINKS` | No | Show the monitor “open link” button. `true` / `false`. |
-| `SITE_PASSWORD` | No | Optional site password. Must be used together with `SITE_SECRE_KEY`. |
-| `SITE_SECRE_KEY` | No | JWT signing secret. The historical typo `SECRE` is intentional. |
+| `SITE_PASSWORD` | No | Optional site password. |
+| `SITE_SECRE_KEY` | No | JWT signing secret. The historical `SECRE` typo is intentional. |
 
 Notes:
 
-- `API_KEY` must be a **Read-Only** key from <https://dashboard.uptimerobot.com/integrations>. Do not use the Main API key.
+- `API_KEY` must be a **Read-Only** key from the [UptimeRobot integrations page](https://dashboard.uptimerobot.com/integrations). Do not use the Main API key.
 - `SITE_PASSWORD` and `SITE_SECRE_KEY` must both be set to enable password protection. Generate a secret with `openssl rand -hex 32`.
-- EdgeOne environment variables cannot contain spaces. In text values use `+` instead of spaces, e.g. `SITE_TITLE="Huoiop+NET+Status"`.
+- EdgeOne environment values cannot contain spaces. Use `+` in text values, e.g. `SITE_TITLE="Huoiop+NET+Status"`.
 - The copyright author is fixed to **Huoiop** (<https://github.com/Huoiop/>). `SITE_AUTHOR` and `SITE_AUTHOR_URL` are no longer used.
 
-## Routes
+## 🧩 How Data Works
 
-| Route | Description |
+- The server calls UptimeRobot v3 `GET /monitors` and `GET /incidents` with
+  `Authorization: Bearer <API_KEY>`.
+- v3 no longer provides v2-style `custom_uptime_ranges`, and the `CUSTOM` stats
+  timeframe requires a paid plan. Daily availability is therefore derived from
+  `Downtime` incidents day by day.
+- Dates before a monitor was created are shown as “no data”.
+- Responses are cached server-side for 60 seconds. The UI refreshes every 5 minutes
+  and also provides a manual refresh button.
+- UptimeRobot Free plans are limited to 10 requests/minute. A cache miss normally
+  makes two upstream requests.
+
+## 🌍 Deployment
+
+### Build targets
+
+`DEPLOYMENT_PLATFORM` controls the build output:
+
+| Value | Target | Output |
+| --- | --- | --- |
+| `cloudflare` (default) | Cloudflare Pages / NuxtHub | `dist/` |
+| `auto` | Generic Node.js server | `.output/` |
+| `eo` | EdgeOne Makers | `.edgeone/` |
+| `esa` | Alibaba Cloud ESA | `.output/server/index.mjs` + `.output/public/` |
+
+### Cloudflare
+
+This project is deployed by default with [Cloudflare Pages](https://pages.cloudflare.com/).
+
+- You can use [NuxtHub](https://hub.nuxt.com/) for a quick deployment, or connect the repository in Cloudflare Pages manually.
+- Configure the environment variables before deploying; see `.env.example`. `API_KEY` is required.
+- If everything goes well, the status page is ready.
+
+| Setting | Value |
 | --- | --- |
-| `/` | Status dashboard: overall banner, system status, bars, calendar. |
-| `/history` | Incident history grouped by month and date. |
-| `/incidents/:id` | Incident detail with affected components and update timeline. |
+| Build command | `pnpm run build` |
+| Environment variables | `DEPLOYMENT_PLATFORM=cloudflare`, `API_KEY`, etc. |
+| Output directory | `dist/` |
 
-The app is an SPA with server API routes. It is **not** a purely static site: `/api/*` and deep links to `/history` and `/incidents/*` need the Nitro server / Worker runtime.
+### Vercel
 
-## How It Works
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/Huoiop/uptimerobot-status)
 
-- `server/api/getMonitors` calls UptimeRobot v3 `GET /monitors` and `GET /incidents` with `Authorization: Bearer <API_KEY>`.
-- Daily availability is derived from `Downtime` incidents, because v3 no longer provides v2-style `custom_uptime_ranges`; the v3 `CUSTOM` stats timeframe requires a paid plan.
-- Days before a monitor was created are shown as “no data”.
-- Responses are cached server-side for 60 seconds. The UI refreshes automatically every 5 minutes and provides a manual refresh button.
-- UptimeRobot Free plans are limited to 10 requests/minute. A cache miss normally makes two upstream requests (`/monitors` and `/incidents`).
+- Click the button above to deploy.
+- Add the following environment variables (important):
 
-## Deployment
+| Variable | Value |
+| --- | --- |
+| `DEPLOYMENT_PLATFORM` | `auto` |
+| `API_KEY` | Your UptimeRobot Read-Only API key |
+| `API_URL` | `https://api.uptimerobot.com/v3/` (optional) |
 
-### Cloudflare Pages / NuxtHub (default)
-
-```bash
-DEPLOYMENT_PLATFORM=cloudflare pnpm run build
-```
-
-- Output: `dist/` (`dist/_worker.js/index.js` for the Worker).
-- Configure `API_KEY` and the other variables in the Cloudflare / NuxtHub project settings.
-- `DEPLOYMENT_PLATFORM=cloudflare` is the default when the variable is unset.
-
-### Generic Node.js / Vercel / Docker
-
-```bash
-DEPLOYMENT_PLATFORM=auto pnpm run build
-node .output/server/index.mjs
-```
-
-- Output: `.output/`.
-- Set `API_KEY` (and other variables) in the platform environment.
-- A Node runtime can also override the API settings with `NUXT_API_KEY` and `NUXT_API_URL` without rebuilding.
+See `.env.example` for the other site variables.
 
 ### EdgeOne Makers
 
-```bash
-DEPLOYMENT_PLATFORM=eo pnpm run build
-```
+Set `DEPLOYMENT_PLATFORM=eo`. The build runs `@edgeone/nuxt-pages` and emits the EdgeOne Build Output API structure into `.edgeone`.
 
-- Node.js 22.x.
-- Output directory: `.edgeone/` (`cloud-functions/ssr-node/handler.js` + `config.json`).
-- Build command: `pnpm run build`.
-- Set `DEPLOYMENT_PLATFORM=eo`, `API_KEY` and the other variables in the EdgeOne console.
-- EdgeOne environment values cannot contain spaces; use `+` in text values. Changes to environment variables take effect on the next deployment.
+| Setting | Value |
+| --- | --- |
+| Root directory | `./` |
+| Install command | `pnpm install` |
+| Build command | `pnpm run build` |
+| Output directory | `.edgeone` |
+| Node.js version | 22.x |
+
+Add `DEPLOYMENT_PLATFORM=eo`, `API_KEY` and the other variables from `.env.example` in the EdgeOne project settings, then deploy.
+
+> EdgeOne environment variable values cannot contain spaces. In text fields (`SITE_TITLE`, `SITE_DESCRIPTION`, `SITE_KEYWORDS`, `SITE_ICP`), use `+` as a space placeholder, e.g. `SITE_TITLE="Huoiop+NET+Status"`.
 
 ### Alibaba Cloud ESA
 
-```bash
-DEPLOYMENT_PLATFORM=esa pnpm run build
+Set `DEPLOYMENT_PLATFORM=esa`. The build uses Nitro's `cloudflare-module` preset and produces an edge Worker.
+
+| Setting | Value |
+| --- | --- |
+| Root directory | `/` |
+| Install command | `pnpm install` |
+| Build command | `pnpm run build` |
+| Static assets directory | `.output/public` |
+| Function file path | `.output/server/index.mjs` |
+| Node.js version | 22.x |
+
+Add `DEPLOYMENT_PLATFORM=esa`, `API_KEY` and the other variables from `.env.example` in the ESA project settings.
+
+You can also configure the same values with an `esa.jsonc` in the repository root:
+
+```jsonc
+{
+  "name": "uptimerobot-status",
+  "entry": "./.output/server/index.mjs",
+  "installCommand": "pnpm install",
+  "buildCommand": "pnpm run build",
+  "assets": {
+    "directory": ".output/public"
+  }
+}
 ```
 
-- Output: `.output/server/index.mjs` (Worker) and `.output/public/` (static assets).
-- Static asset directory: `.output/public`.
-- Function entry: `.output/server/index.mjs`.
-- Do **not** configure `notFoundStrategy: singlePageApplication`: the Nitro function handles SPA routes and API requests. Using a static-only fallback will break `/history`, `/incidents/*` and `/api/*`.
+> When `esa.jsonc` exists, its settings take precedence over the ESA console build configuration.
+>
+> Do **not** configure `notFoundStrategy: singlePageApplication`: Nitro handles SPA
+> routes and API requests. A static-only fallback breaks `/history`, `/incidents/*`
+> and `/api/*`.
 
-## Security
+### Other Hosting Platforms
 
-- The repository is public. Never commit `.env` or any real API key / JWT secret.
-- `.env.example` contains placeholders only. If a real key is ever exposed, rotate it in the UptimeRobot dashboard.
-- The API key is read-only and is only used by the server-side API route.
-- Password protection is optional, but recommended if the monitor data should not be public.
-- Deploying a new version may leave an old Service Worker cached. Hard-refresh or clear site data if the UI still looks stale.
+For deployment guides, refer to the official documentation: [Deploying Nuxt Apps](https://nuxtjs.org.cn/deploy)
 
-## Credits
+## ❓ Q & A
+
+### How to enable site encryption
+
+Add `SITE_PASSWORD` and `SITE_SECRE_KEY` to the environment variables. Both are required.
+`SITE_PASSWORD` is the site password, and `SITE_SECRE_KEY` is the JWT signing secret.
+
+### How to customize footer links
+
+Use `SITE_GITHUB`, `SITE_HOME` and `SITE_EMAIL`. See `.env.example`.
+
+The copyright line always shows `Huoiop` (linking to <https://github.com/Huoiop/>).
+The author is fixed and is no longer configured through environment variables.
+
+### Where does the daily availability come from
+
+UptimeRobot v3 no longer provides v2's `custom_uptime_ranges`. This project fetches
+`Downtime` incidents and calculates downtime and availability per day. Dates before
+a monitor was created are shown as “no data”.
+
+### The page still looks old after deployment
+
+The browser may still cache an old Service Worker. Hard-refresh the page or clear
+site data for the site.
+
+### Can it be deployed as a purely static site
+
+No. `/api/*` needs a server runtime, and `/history` and `/incidents/*` need SPA
+routing. Use Node, Cloudflare Workers, EdgeOne, ESA or another platform with a
+server runtime.
+
+## 🙏 Thanks
 
 - [DeepSeek Status](https://status.deepseek.com/) — the status page design this project references
 - [imsyy/site-status](https://github.com/imsyy/site-status) — the status page project this project is based on
@@ -160,10 +260,10 @@ DEPLOYMENT_PLATFORM=esa pnpm run build
 - [UptimeRobot](https://uptimerobot.com/) — monitoring API
 - HarmonyOS_Regular font served by the Bilibili CDN
 
-## License
+## 📄 License
 
 [MIT](./LICENSE)
 
-## Author
+## 👤 Author
 
 [Huoiop](https://github.com/Huoiop/)
