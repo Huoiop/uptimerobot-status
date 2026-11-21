@@ -1,4 +1,4 @@
-import type { SiteIncident } from "~~/types/main";
+import type { SiteIncident, SiteStatusType } from "~~/types/main";
 
 /**
  * 故障信息，去掉与错误码重复的前缀。
@@ -24,6 +24,22 @@ export const getIncidentMessage = (
     }
   }
   return reason;
+};
+
+/**
+ * 获取监控项最近一次故障
+ */
+export const getLastIncident = (
+  site?: SiteStatusType,
+): SiteIncident | undefined => {
+  if (!site) return undefined;
+  let last: SiteIncident | undefined;
+  site.days.forEach((day) => {
+    day.incidents?.forEach((incident) => {
+      if (!last || incident.startedAt > last.startedAt) last = incident;
+    });
+  });
+  return last;
 };
 
 /**

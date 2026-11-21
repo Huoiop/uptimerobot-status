@@ -21,52 +21,26 @@
                 >
                   {{ tag.name }}
                 </span>
-                <n-popover trigger="hover" placement="top">
+                <n-popover
+                  v-if="!noHover"
+                  trigger="hover"
+                  placement="top"
+                >
                   <template #trigger>
                     <button class="info-btn" aria-label="info">
                       <Icon name="icon:info" />
                     </button>
                   </template>
-                  <div class="info-pop">
-                    <div class="info-row">
-                      <span>{{ $t("status.type") }}</span>
-                      <span>{{ siteTypeMap[site.type]?.tag || site.type }}</span>
-                    </div>
-                    <div class="info-row">
-                      <span>{{ $t("status.interval") }}</span>
-                      <span>{{ formatInterval(site.interval) }}</span>
-                    </div>
-                    <div class="info-row">
-                      <span>{{ $t("status.availability") }}</span>
-                      <span>{{ site.percent }}%</span>
-                    </div>
-                    <div v-if="site.tags.length" class="info-tags">
-                      <span
-                        v-for="tag in site.tags"
-                        :key="tag.id ?? tag.name"
-                        class="tag-pill"
-                      >
-                        {{ tag.name }}
-                      </span>
-                    </div>
-                    <div v-if="lastIncidentOf(site)" class="info-last">
-                      <div class="info-label">
-                        {{ $t("status.lastIncident") }}
-                      </div>
-                      <div>
-                        {{
-                          formatTime(lastIncidentOf(site)?.startedAt || 0, {
-                            showTime: true,
-                          })
-                        }}
-                        · {{ incidentMessage(lastIncidentOf(site)) }}
-                      </div>
-                    </div>
-                    <div v-if="siteTypeMap[site.type]?.text" class="info-desc">
-                      {{ siteTypeMap[site.type]?.text }}
-                    </div>
-                  </div>
+                  <MonitorInfo :site="site" />
                 </n-popover>
+                <button
+                  v-else
+                  class="info-btn"
+                  aria-label="info"
+                  @click="openInfo(site)"
+                >
+                  <Icon name="icon:info" />
+                </button>
                 <span
                   v-if="
                     (site.status === 8 || site.status === 9) &&
@@ -279,6 +253,28 @@
       />
     </n-modal>
 
+    <!-- 监控项详细信息（移动端） -->
+    <n-modal
+      v-model:show="infoModal"
+      preset="card"
+      :style="{ width: 'min(460px, calc(100vw - 32px))' }"
+      :content-style="{ maxHeight: '70vh', overflowY: 'auto' }"
+    >
+      <template #header>
+        <div class="info-modal-title">
+          <span>{{ infoSite?.name || $t("status.type") }}</span>
+          <span
+            v-for="tag in infoSite?.tags || []"
+            :key="tag.id ?? tag.name"
+            class="tag-pill"
+          >
+            {{ tag.name }}
+          </span>
+        </div>
+      </template>
+      <MonitorInfo v-if="infoSite" :site="infoSite" :show-tags="false" />
+    </n-modal>
+
     <!-- 立柱悬浮提示 -->
     <Teleport to="body">
       <div
@@ -358,6 +354,7 @@
 <script setup lang="ts">
 import { useMediaQuery } from "@vueuse/core";
 import dayjs from "dayjs";
+import MonitorInfo from "~/components/MonitorInfo.vue";
 import { useAppRoute } from "~/composables/useAppRoute";
 import { getIncidentMessage, getIncidentTitle } from "~/utils/incident";
 import type {
@@ -391,28 +388,6 @@ const result = computed(() => statusStore.siteData);
 const sites = computed(() => result.value?.data ?? []);
 const loading = computed(
   () => !result.value && statusStore.siteStatus === "loading",
-);
-
-// 请求类型
-const siteTypeMap = computed<Record<string, { tag: string; text: string }>>(
-  () => ({
-    HTTP: { tag: "HTTP", text: t("card.type.HTTP") },
-    KEYWORD: { tag: "KEYWORD", text: t("card.type.KEYWORD") },
-    PING: { tag: "PING", text: t("card.type.PING") },
-    PORT: { tag: "PORT", text: t("card.type.PORT") },
-    HEARTBEAT: { tag: "HEARTBEAT", text: t("card.type.HEARTBEAT") },
-    DNS: { tag: "DNS", text: t("card.type.DNS") },
-    API: { tag: "API", text: t("card.type.API") },
-    UDP: { tag: "UDP", text: t("card.type.UDP") },
-    VISUAL_COMPARISON: {
-      tag: "VISUAL",
-      text: t("card.type.VISUAL_COMPARISON"),
-    },
-    THIRD_PARTY_SERVICE: {
-      tag: "3RD-PARTY",
-      text: t("card.type.THIRD_PARTY_SERVICE"),
-    },
-  }),
 );
 
 // 监控项状态
@@ -521,16 +496,6 @@ const clearHoveredBar = () => {
 
 const incidentMessage = (incident?: SiteIncident) =>
   getIncidentMessage(incident, t("card.unknownReason"));
-
-const lastIncidentOf = (site: SiteStatusType): SiteIncident | undefined => {
-  let last: SiteIncident | undefined;
-  site.days.forEach((day) => {
-    day.incidents?.forEach((incident) => {
-      if (!last || incident.startedAt > last.startedAt) last = incident;
-    });
-  });
-  return last;
-};
 
 // 日期文本
 const allDateTexts = computed(() =>
@@ -709,6 +674,13 @@ const calendarCells = computed(() => {
 // 弹窗
 const dayModal = ref(false);
 const selected = ref<SelectedDay>();
+const infoModal = ref(false);
+const infoSite = ref<SiteStatusType | null>(null);
+
+const openInfo = (site: SiteStatusType) => {
+  infoSite.value = site;
+  infoModal.value = true;
+};
 
 const dayModalTitle = computed(() => formatFullDate(selected.value?.dateText));
 
@@ -1134,39 +1106,14 @@ onBeforeUnmount(() => {
     border-color: var(--border-strong);
   }
 }
-.info-pop {
+.info-modal-title {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-width: 220px;
-  font-size: 12px;
-  .info-row {
-    display: flex;
-    justify-content: space-between;
-    gap: 12px;
-    span:first-child {
-      color: var(--muted-text);
-    }
-  }
-  .info-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-  }
-  .info-last {
-    padding-top: 6px;
-    border-top: 1px solid var(--border-color);
-    line-height: 1.6;
-  }
-  .info-label {
-    color: var(--muted-text);
-  }
-  .info-desc {
-    padding-top: 6px;
-    border-top: 1px solid var(--border-color);
-    color: var(--muted-text);
-    line-height: 1.6;
-  }
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-color);
 }
 .modal-summary {
   display: flex;
